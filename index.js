@@ -2,7 +2,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebas
 import {
   getDatabase,
   ref,
-  push,
+  push, 
+  onValue
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
 
 const appSettings = {
@@ -23,22 +24,38 @@ const shoppingListInDB = ref(database, "shoppingList");
 
 const inputFieldEl = document.getElementById("input-field");
 const addButtonEl = document.getElementById("add-button");
-const shoppingItems = document.getElementById("shopping-list")
+const shoppingListEl = document.getElementById("shopping-list")
 
 addButtonEl.addEventListener("click", function () {
   let inputValue = inputFieldEl.value;
   push(shoppingListInDB, inputValue);
 
   clearInputFieldEl()
-  appendItemToShoppingListEl(inputValue)
 
-});
+})
+
+onValue(shoppingListInDB, function(snapshot){
+    let itemsArray = Object.values(snapshot.val()) // takess snapshot everytime database is updated
+
+    clearShoppingListEl()
+
+    for (let i = 0; i < itemsArray.length; i++) {
+
+        appendItemToShoppingListEl(itemsArray[i])
+
+    }
+
+})
 
 function clearInputFieldEl() {
     inputFieldEl.value = ""
 }
 
 function appendItemToShoppingListEl(itemValue) {
-    shoppingItems.innerHTML += `<li>${itemValue}</li>`
+    shoppingListEl.innerHTML += `<li>${itemValue}</li>`
+}
+
+function clearShoppingListEl() {
+    shoppingListEl.innerHTML = ""
 }
 
